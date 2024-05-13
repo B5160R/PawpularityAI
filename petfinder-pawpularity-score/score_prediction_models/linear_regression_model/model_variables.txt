@@ -1,0 +1,4 @@
+Model Variables: {'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}
+Model Coefficients: [-0.78840378 -2.19287812  2.54216559  0.57525737  0.46179151  1.61081174
+  1.36414871  0.61134514  0.28060697 -0.17230578 -0.58977692 -3.22128273]
+Model Intercept: 36.89388168071542
