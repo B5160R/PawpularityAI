@@ -169,7 +169,7 @@ class TestModelsPage(tk.Frame):
 			prediction = self.master.score_ensemble_model.predict([input_data])
 		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
 			prediction = self.master.is_human_rscv_decision_tree_model.predict([input_data])
-		elif self.model_var.get() == "IsOcculsion - Bayes":
+		elif self.model_var.get() == "IsOcclusion - Bayes":
 			prediction = self.master.is_occlusion_bayes_model.predict([input_data])
 
 		print("--------- Prediction ---------")
@@ -211,7 +211,7 @@ class TestModelsPage(tk.Frame):
 		elif self.model_var.get() == "Score - Ensemble Model":
 			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
 		
-		elif self.model_var.get() == "IsHuman - Decision Tree":
+		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
 			if self.pet_ids_and_scores.iloc[i][2] == 0:
 				self.result_label.config(text="Predicted Is Human: False")
 			else:
