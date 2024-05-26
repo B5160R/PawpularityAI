@@ -1,5 +1,5 @@
 import tkinter as tk
-from matplotlib import transforms
+#from matplotlib import transforms
 import pandas as pd
 from PIL import Image, ImageTk
 from torchvision import transforms
@@ -65,7 +65,7 @@ class TestModelsPage(tk.Frame):
 			self.checkbox_vars.append(var)
 
 		# Create dropdown menu for selecting the model
-		models = ["Score - Linear Regression", "Score - Ensemble Model", "IsHuman - RSV Decision Tree", "IsOcclusion - Bayes"]
+		models = ["Score - Linear Regression", "Score - Ensemble Model", "IsHuman - RSCV Decision Tree", "IsOcclusion - Bayes"]
 		self.model_var = tk.StringVar()
 		self.model_var.set(models[0])
 		model_dropdown = tk.OptionMenu(self.base_frame, self.model_var, *models)
@@ -167,10 +167,14 @@ class TestModelsPage(tk.Frame):
 			prediction = self.master.score_regression_model.predict([input_data])
 		elif self.model_var.get() == "Score - Ensemble Model":
 			prediction = self.master.score_ensemble_model.predict([input_data])
-		elif self.model_var.get() == "IsHuman - Random Search CV Decision Tree":
+		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
 			prediction = self.master.is_human_rscv_decision_tree_model.predict([input_data])
 		elif self.model_var.get() == "IsOcculsion - Bayes":
 			prediction = self.master.is_occlusion_bayes_model.predict([input_data])
+
+		print("--------- Prediction ---------")
+		print(prediction)
+		print("------------------------------")
   
 		pet_ids_and_scores = self.get_pet_ids_and_scores(input_data)
 		
