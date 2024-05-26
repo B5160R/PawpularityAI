@@ -65,7 +65,7 @@ class TestModelsPage(tk.Frame):
 			self.checkbox_vars.append(var)
 
 		# Create dropdown menu for selecting the model
-		models = ["Linear Regression", "Decision Tree", "Random Search CV Decision Tree", "Bayes"]
+		models = ["Score - Linear Regression", "Score - Ensemble Model", "IsHuman - RSV Decision Tree", "Random Search CV Decision Tree", "IsOcclusion - Bayes"]
 		self.model_var = tk.StringVar()
 		self.model_var.set(models[0])
 		model_dropdown = tk.OptionMenu(self.base_frame, self.model_var, *models)
@@ -163,13 +163,13 @@ class TestModelsPage(tk.Frame):
 		print("------------------------------")
   
 		# Run the model prediction
-		if self.model_var.get() == "Linear Regression":
+		if self.model_var.get() == "Score - Linear Regression":
 			prediction = self.master.score_regression_model.predict([input_data])
-		elif self.model_var.get() == "Decision Tree":
-			prediction = self.master.is_human_decision_tree_model.predict([input_data])
-		elif self.model_var.get() == "Random Search CV Decision Tree":
+		elif self.model_var.get() == "Score - Ensemble Model":
+			prediction = self.master.score_ensemble_model.predict([input_data])
+		elif self.model_var.get() == "IsHuman - Random Search CV Decision Tree":
 			prediction = self.master.is_human_rscv_decision_tree_model.predict([input_data])
-		elif self.model_var.get() == "Bayes":
+		elif self.model_var.get() == "IsOcculsion - Bayes":
 			prediction = self.master.is_occlusion_bayes_model.predict([input_data])
   
 		pet_ids_and_scores = self.get_pet_ids_and_scores(input_data)
