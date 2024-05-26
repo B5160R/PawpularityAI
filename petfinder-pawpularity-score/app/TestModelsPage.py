@@ -3,6 +3,7 @@ from matplotlib import transforms
 import pandas as pd
 from PIL import Image, ImageTk
 from torchvision import transforms
+import torch.nn.functional as functional
 import sys
 sys.path.append("../image_models/cat_or_dog")
 from CatOrDogCNN import CatOrDogCNN
@@ -134,13 +135,17 @@ class TestModelsPage(tk.Frame):
 		model = CatOrDogCNN(2) 
 		model.load_state_dict(self.master.cat_or_dog_model)
 		model.eval()
-		output = model(image).argmax().item()
-		
+		output = model(image)
+		propabilities = functional.softmax(output, dim=1)
+		predicted_class = propabilities.argmax().item()
+		certainty_percentage = propabilities[0][predicted_class].item() * 100
+  
+
 		# Display the result
-		if output == 0:
-			self.cnn_result_label.config(text="The model predicts that the image is a cat.")
+		if predicted_class == 0:
+			self.cnn_result_label.config(text=f"The model predicts that the image is a cat.\nPrediction Certainty: {certainty_percentage:.2f}%")
 		else:
-			self.cnn_result_label.config(text="The model predicts that the image is a dog.")
+			self.cnn_result_label.config(text=f"The model predicts that the image is a dog.\nPrediction Certainty: {certainty_percentage:.2f}%")
 
 		# Display performance metrics
 		metrics = self.read_metrics("../image_models/cat_or_dog/performance_metrics.txt")
