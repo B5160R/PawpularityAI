@@ -9,10 +9,10 @@ sys.path.append("../image_models/cat_or_dog")
 from CatOrDogCNN import CatOrDogCNN
 
 MODEL_PATHS = {
-    "Linear Regression": "../score_prediction_models/linear_regression_model/performance_metrics.txt",
-    "Decision Tree": "../feature_finding_models/decision_tree_model/performance_metrics.txt",
-    "Random Search CV Decision Tree": "../feature_finding_models/decision_tree_model/random_search_cv_performance_metrics.txt",
-    "Bayes": "../feature_finding_models/bayes_model/performance_metrics.txt",
+    "Score - Linear Regression": "../score_prediction_models/linear_regression_model/performance_metrics.txt",
+    "Score - Ensemble Model": "../score_prediction_models/ensemble_model/performance_metrics.txt",
+    "IsHuman - Random Search CV Decision Tree": "../feature_finding_models/decision_tree_model/random_search_cv_performance_metrics.txt",
+    "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/performance_metrics.txt",
 }
 
 class TestModelsPage(tk.Frame):
@@ -65,7 +65,7 @@ class TestModelsPage(tk.Frame):
 			self.checkbox_vars.append(var)
 
 		# Create dropdown menu for selecting the model
-		models = ["Score - Linear Regression", "Score - Ensemble Model", "IsHuman - RSV Decision Tree", "Random Search CV Decision Tree", "IsOcclusion - Bayes"]
+		models = ["Score - Linear Regression", "Score - Ensemble Model", "IsHuman - RSV Decision Tree", "IsOcclusion - Bayes"]
 		self.model_var = tk.StringVar()
 		self.model_var.set(models[0])
 		model_dropdown = tk.OptionMenu(self.base_frame, self.model_var, *models)
@@ -201,16 +201,19 @@ class TestModelsPage(tk.Frame):
 		self.result_number_label.config(text=f"Showing result: {i+1}/{len(self.pet_ids_and_scores)}")
 
 		# Display the prediction result based on the model
-		if self.model_var.get() == "Linear Regression":
+		if self.model_var.get() == "Score - Linear Regression":
 			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
-   
-		elif self.model_var.get() == "Decision Tree" or self.model_var.get() == "Random Search CV Decision Tree":
+		
+		elif self.model_var.get() == "Score - Ensemble Model":
+			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
+		
+		elif self.model_var.get() == "IsHuman - Decision Tree":
 			if self.pet_ids_and_scores.iloc[i][2] == 0:
 				self.result_label.config(text="Predicted Is Human: False")
 			else:
 				self.result_label.config(text="Predicted Is Human: True")
-    
-		elif self.model_var.get() == "Bayes":
+
+		elif self.model_var.get() == "IsOcclusion - Bayes":
 			if self.pet_ids_and_scores.iloc[i][2] == 0:
 				self.result_label.config(text="Predicted Is Occluded: False")
 			else:

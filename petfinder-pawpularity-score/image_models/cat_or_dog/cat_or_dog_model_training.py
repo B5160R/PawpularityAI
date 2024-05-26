@@ -9,12 +9,12 @@ from CatOrDogCNN import CatOrDogCNN
 
 # Load the data
 
-trainData = ImageFolder(root='data/train', transform=transforms.Compose([
+trainData = ImageFolder(root='../../data/cat_or_dog/train', transform=transforms.Compose([
 		transforms.Resize((64, 64)),
 		transforms.ToTensor()
 ]))
 
-testData = ImageFolder(root='data/test', transform=transforms.Compose([
+testData = ImageFolder(root='../../data/cat_or_dog/test', transform=transforms.Compose([
 		transforms.Resize((64, 64)),
 		transforms.ToTensor()
 ]))
