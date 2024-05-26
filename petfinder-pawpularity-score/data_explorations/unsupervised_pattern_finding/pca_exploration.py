@@ -6,7 +6,7 @@ from sklearn import decomposition
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 
-df = pd.read_csv("../../data/pawpularity/train.csv")
+df = pd.read_csv("../data/pawpularity/train.csv")
 df = df.dropna()
 
 # split data

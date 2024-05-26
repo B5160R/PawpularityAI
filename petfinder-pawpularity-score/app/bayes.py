@@ -19,7 +19,3 @@ print(p_b_a)
 p_a_b = (p_b_a * p_a) / p_b
 
 print(p_a_b)
-
-  
-
-

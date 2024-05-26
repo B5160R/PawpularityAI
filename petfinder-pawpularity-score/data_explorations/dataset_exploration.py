@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the data
-df = pd.read_csv("../../data/pawpularity/train.csv")
+df = pd.read_csv("../data/pawpularity/train.csv")
 
 print("\n*** Number of rows and columns in the dataset ***")
 print(df.shape)
