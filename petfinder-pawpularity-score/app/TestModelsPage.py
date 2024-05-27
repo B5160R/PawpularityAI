@@ -1,18 +1,25 @@
 import tkinter as tk
-#from matplotlib import transforms
 import pandas as pd
+import torch
+import torch.nn.functional as functional
 from PIL import Image, ImageTk
 from torchvision import transforms
-import torch.nn.functional as functional
 import sys
+sys.path.append("../score_prediction_models/neural_network_model")
+from NNScoreModel import NNScoreModel
 sys.path.append("../image_models/cat_or_dog")
 from CatOrDogCNN import CatOrDogCNN
 
 MODEL_PATHS = {
-    "Score - Linear Regression": "../score_prediction_models/linear_regression_model/performance_metrics.txt",
-    "Score - Ensemble Model": "../score_prediction_models/ensemble_model/performance_metrics.txt",
-    "IsHuman - Random Search CV Decision Tree": "../feature_finding_models/decision_tree_model/random_search_cv_performance_metrics.txt",
-    "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/performance_metrics.txt",
+    "Score - Linear Regression": "../score_prediction_models/linear_regression_model/",
+    "Score - Ensemble Model": "../score_prediction_models/ensemble_model/",
+    "Score - Neural Network Model": "../score_prediction_models/neural_network_model/",
+    "Score - Random Forest Regressor": "../score_prediction_models/random_forrest_regressor_model/",
+    "Score - Stacked Classifier": "../score_prediction_models/stacked_classifier_model/",
+    "IsHuman - Decision Tree Boost": "../feature_finding_models/decision_tree_model_boost/",
+    "IsHuman - RSCV Decision Tree": "../feature_finding_models/rscv_decision_tree_model/",
+    "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/",
+    "Cat or Dog - CNN": "../image_models/cat_or_dog/"
 }
 
 class TestModelsPage(tk.Frame):
@@ -65,19 +72,23 @@ class TestModelsPage(tk.Frame):
 			self.checkbox_vars.append(var)
 
 		# Create dropdown menu for selecting the model
-		models = ["Score - Linear Regression", "Score - Ensemble Model", "IsHuman - RSCV Decision Tree", "IsOcclusion - Bayes"]
+		models = ["Score - Linear Regression", "Score - Ensemble Model", "Score - Stacked Classifier", "Score - Random Forest Regressor", "Score - Neural Network Model", "IsHuman - Decision Tree Boost", "IsHuman - RSCV Decision Tree", "IsOcclusion - Bayes"]
 		self.model_var = tk.StringVar()
 		self.model_var.set(models[0])
 		model_dropdown = tk.OptionMenu(self.base_frame, self.model_var, *models)
 		model_dropdown.grid(row=len(checkbox_labels) // 6 + 2, column=0, padx=5, pady=5, columnspan=2)
 	
-		# Create Submit Button
-		submit_button = tk.Button(self.base_frame, text="Submit", command=self.run_model)
+		# Create Run Button
+		submit_button = tk.Button(self.base_frame, text="Run Model", command=self.run_model)
 		submit_button.grid(row=len(checkbox_labels) // 6 + 2, column=2, padx=5, pady=5)
 	
 		# Create Metrics Button
 		metrics_button = tk.Button(self.base_frame, text="Show Performance Metrics", command=self.show_metrics)
 		metrics_button.grid(row=len(checkbox_labels) // 6 + 2, column=3, padx=5, pady=5)
+
+		# Create Model Variables Button
+		model_variables_button = tk.Button(self.base_frame, text="Show Model Variables", command=self.show_model_variables)
+		model_variables_button.grid(row=len(checkbox_labels) // 6 + 2, column=4, padx=5, pady=5)
   
 		# Create Result Label
 		self.result_label = tk.Label(self.base_frame, text="")
@@ -167,6 +178,18 @@ class TestModelsPage(tk.Frame):
 			prediction = self.master.score_regression_model.predict([input_data])
 		elif self.model_var.get() == "Score - Ensemble Model":
 			prediction = self.master.score_ensemble_model.predict([input_data])
+		elif self.model_var.get() == "Score - Stacked Classifier":
+			prediction = self.master.score_stacked_classifier_model.predict([input_data])
+		elif self.model_var.get() == "Score - Random Forest Regressor":
+			prediction = self.master.score_random_forest_model.predict([input_data])
+		elif self.model_var.get() == "Score - Neural Network Model":
+			model = NNScoreModel(len(input_data))
+			model.load_state_dict(self.master.score_nn_model)
+			model.eval()
+			input_tensor = torch.tensor(input_data).float()
+			prediction = model(input_tensor)
+		elif self.model_var.get() == "IsHuman - Decision Tree Boost":
+			prediction = self.master.is_human_decision_tree_boost_model.predict([input_data])
 		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
 			prediction = self.master.is_human_rscv_decision_tree_model.predict([input_data])
 		elif self.model_var.get() == "IsOcclusion - Bayes":
@@ -205,13 +228,10 @@ class TestModelsPage(tk.Frame):
 		self.result_number_label.config(text=f"Showing result: {i+1}/{len(self.pet_ids_and_scores)}")
 
 		# Display the prediction result based on the model
-		if self.model_var.get() == "Score - Linear Regression":
+		if self.model_var.get() != "IsHuman - RSCV Decision Tree" or self.model_var.get() != "IsHuman - Decision Tree Boost" or self.model_var.get() != "IsOcclusion - Bayes":
 			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
 		
-		elif self.model_var.get() == "Score - Ensemble Model":
-			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
-		
-		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
+		elif self.model_var.get() == "IsHuman - RSCV Decision Tree" or self.model_var.get() == "IsHuman - Decision Tree Boost":
 			if self.pet_ids_and_scores.iloc[i][2] == 0:
 				self.result_label.config(text="Predicted Is Human: False")
 			else:
@@ -270,14 +290,22 @@ class TestModelsPage(tk.Frame):
 
 		return df.loc[pet_indexes, ["Id", "Pawpularity"]]
 
+	def show_model_variables(self):
+		self.remove_result_labels_and_buttons()
+		model_name = self.model_var.get()
+		file_path = MODEL_PATHS[model_name] + "model_variables.txt"
+		model_variables = self.read_file(file_path)
+		self.result_label.config(text=model_variables)
+
+
 	def show_metrics(self):
 		self.remove_result_labels_and_buttons()
 		model_name = self.model_var.get()
-		file_path = MODEL_PATHS[model_name]
-		metrics = self.read_metrics(file_path)
+		file_path = MODEL_PATHS[model_name] + "performance_metrics.txt"
+		metrics = self.read_file(file_path)
 		self.result_label.config(text=metrics) 
 
-	def read_metrics(self, file_path):
+	def read_file(self, file_path):
 		with open(file_path, "r") as file:
 			return file.read()
 		

@@ -1,1 +1,2 @@
-Accuracy: 0.0
+Mean Absolute Error: 15.696923447732937
+R2 Score: 0.002148004241301571
