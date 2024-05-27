@@ -11,15 +11,15 @@ sys.path.append("../image_models/cat_or_dog")
 from CatOrDogCNN import CatOrDogCNN
 
 MODEL_PATHS = {
-    "Score - Linear Regression": "../score_prediction_models/linear_regression_model/performance_metrics.txt",
-    "Score - Ensemble Model": "../score_prediction_models/ensemble_model/performance_metrics.txt",
-    "Score - Neural Network Model": "../score_prediction_models/neural_network_model/performance_metrics.txt",
-    "Score - Random Forest Regressor": "../score_prediction_models/random_forrest_regressor_model/performance_metrics.txt",
-    "Score - Stacked Classifier": "../score_prediction_models/stacked_classifier_model/performance_metrics.txt",
-    "IsHuman - Decision Tree Boost": "../feature_finding_models/decision_tree_model_boost/performance_metrics.txt",
-    "IsHuman - RSCV Decision Tree": "../feature_finding_models/rscv_decision_tree_model/performance_metrics.txt",
-    "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/performance_metrics.txt",
-    "Cat or Dog - CNN": "../image_models/cat_or_dog/performance_metrics.txt"
+    "Score - Linear Regression": "../score_prediction_models/linear_regression_model/",
+    "Score - Ensemble Model": "../score_prediction_models/ensemble_model/",
+    "Score - Neural Network Model": "../score_prediction_models/neural_network_model/",
+    "Score - Random Forest Regressor": "../score_prediction_models/random_forrest_regressor_model/",
+    "Score - Stacked Classifier": "../score_prediction_models/stacked_classifier_model/",
+    "IsHuman - Decision Tree Boost": "../feature_finding_models/decision_tree_model_boost/",
+    "IsHuman - RSCV Decision Tree": "../feature_finding_models/rscv_decision_tree_model/",
+    "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/",
+    "Cat or Dog - CNN": "../image_models/cat_or_dog/"
 }
 
 class TestModelsPage(tk.Frame):
@@ -78,13 +78,17 @@ class TestModelsPage(tk.Frame):
 		model_dropdown = tk.OptionMenu(self.base_frame, self.model_var, *models)
 		model_dropdown.grid(row=len(checkbox_labels) // 6 + 2, column=0, padx=5, pady=5, columnspan=2)
 	
-		# Create Submit Button
-		submit_button = tk.Button(self.base_frame, text="Submit", command=self.run_model)
+		# Create Run Button
+		submit_button = tk.Button(self.base_frame, text="Run Model", command=self.run_model)
 		submit_button.grid(row=len(checkbox_labels) // 6 + 2, column=2, padx=5, pady=5)
 	
 		# Create Metrics Button
 		metrics_button = tk.Button(self.base_frame, text="Show Performance Metrics", command=self.show_metrics)
 		metrics_button.grid(row=len(checkbox_labels) // 6 + 2, column=3, padx=5, pady=5)
+
+		# Create Model Variables Button
+		model_variables_button = tk.Button(self.base_frame, text="Show Model Variables", command=self.show_model_variables)
+		model_variables_button.grid(row=len(checkbox_labels) // 6 + 2, column=4, padx=5, pady=5)
   
 		# Create Result Label
 		self.result_label = tk.Label(self.base_frame, text="")
@@ -286,14 +290,22 @@ class TestModelsPage(tk.Frame):
 
 		return df.loc[pet_indexes, ["Id", "Pawpularity"]]
 
+	def show_model_variables(self):
+		self.remove_result_labels_and_buttons()
+		model_name = self.model_var.get()
+		file_path = MODEL_PATHS[model_name] + "model_variables.txt"
+		model_variables = self.read_file(file_path)
+		self.result_label.config(text=model_variables)
+
+
 	def show_metrics(self):
 		self.remove_result_labels_and_buttons()
 		model_name = self.model_var.get()
-		file_path = MODEL_PATHS[model_name]
-		metrics = self.read_metrics(file_path)
+		file_path = MODEL_PATHS[model_name] + "performance_metrics.txt"
+		metrics = self.read_file(file_path)
 		self.result_label.config(text=metrics) 
 
-	def read_metrics(self, file_path):
+	def read_file(self, file_path):
 		with open(file_path, "r") as file:
 			return file.read()
 		
