@@ -22,6 +22,9 @@ sns.histplot(df["Pawpularity"], bins=30, kde=True)
 plt.title("Pawpularity Distribution")
 plt.show()
 
+# save plot
+plt.savefig("exploration_outputs/pawpularity_distribution.png")
+
 print("\n*** Number of rows with Pawpularity > 80 for each feature ***")
 result = df[df["Pawpularity"] > 80].drop(columns=["Id", "Pawpularity"]).sum()
 print(result)
@@ -35,6 +38,9 @@ corr_matrix = df.drop(columns=["Id", "Pawpularity"]).corr()
 plt.figure(figsize=(20, 10))
 sns.heatmap(corr_matrix, annot=True)
 plt.show()
+
+# save plot
+plt.savefig("exploration_outputs/correlation_matrix.png")
 
 features = df.columns.values.tolist()
 for variable in features[1:-1]:

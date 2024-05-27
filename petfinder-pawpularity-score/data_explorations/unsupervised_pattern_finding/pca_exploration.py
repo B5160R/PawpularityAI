@@ -6,7 +6,7 @@ from sklearn import decomposition
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 
-df = pd.read_csv("../data/pawpularity/train.csv")
+df = pd.read_csv("../../data/pawpularity/train.csv")
 df = df.dropna()
 
 # split data
@@ -45,6 +45,9 @@ plt.ylabel('Error')
 plt.title('Elbow Method')
 plt.show()
 
+# save plot
+fig.savefig("plots/elbow_method.png")
+
 # cluster the data using KMeans
 kmeans = KMeans(n_clusters=5)
 kmeans.fit(X_pca)
@@ -71,3 +74,6 @@ fig = plt.figure(figsize=(8, 8))
 plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_dbscan, cmap=plt.cm.nipy_spectral, edgecolor='k')
 plt.title('DBSCAN Clustering')
 plt.show()
+
+# save plot
+fig.savefig("plots/dbscan_clustering.png")
