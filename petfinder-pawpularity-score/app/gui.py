@@ -49,10 +49,16 @@ class Application(tk.Tk):
         frame.tkraise()
 
     def load_models(self):
+        # Score prediction models
         self.score_regression_model = joblib.load("../score_prediction_models/linear_regression_model/pawpularity_regression_model.pkl")
         self.score_ensemble_model = joblib.load("../score_prediction_models/ensemble_model/ensemble_model.pkl")
+        self.score_nn_model = torch.load("../score_prediction_models/neural_network_model/neural_network_model.pth")
+        
+        # Feature finding models
         self.is_occlusion_bayes_model = joblib.load("../feature_finding_models/bayes_model/occlusion_bayes_model.pkl")
         self.is_human_rscv_decision_tree_model = joblib.load("../feature_finding_models/decision_tree_model/random_search_cv_is_human_decision_tree_model.pkl")
+        
+        # CNN models
         self.cat_or_dog_model = torch.load("../image_models/cat_or_dog/cat_or_dog_model.pth")
 
 if __name__ == "__main__":
