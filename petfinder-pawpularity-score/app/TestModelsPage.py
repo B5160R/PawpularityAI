@@ -1,11 +1,12 @@
 import tkinter as tk
-#from matplotlib import transforms
 import pandas as pd
-from PIL import Image, ImageTk
 import torch
-from torchvision import transforms
 import torch.nn.functional as functional
+from PIL import Image, ImageTk
+from torchvision import transforms
 import sys
+sys.path.append("../score_prediction_models/neural_network_model")
+from NNScoreModel import NNScoreModel
 sys.path.append("../image_models/cat_or_dog")
 from CatOrDogCNN import CatOrDogCNN
 
@@ -13,6 +14,8 @@ MODEL_PATHS = {
     "Score - Linear Regression": "../score_prediction_models/linear_regression_model/performance_metrics.txt",
     "Score - Ensemble Model": "../score_prediction_models/ensemble_model/performance_metrics.txt",
     "Score - Neural Network Model": "../score_prediction_models/neural_network_model/performance_metrics.txt",
+    "Score - Random Forest Regressor": "../score_prediction_models/random_forrest_regressor_model/performance_metrics.txt",
+    "Score - Stacked Classifier": "../score_prediction_models/stacked_classifier_model/performance_metrics.txt",
     "IsHuman - Random Search CV Decision Tree": "../feature_finding_models/decision_tree_model/random_search_cv_performance_metrics.txt",
     "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/performance_metrics.txt",
     "Cat or Dog - CNN": "../image_models/cat_or_dog/performance_metrics.txt"
@@ -68,7 +71,7 @@ class TestModelsPage(tk.Frame):
 			self.checkbox_vars.append(var)
 
 		# Create dropdown menu for selecting the model
-		models = ["Score - Linear Regression", "Score - Ensemble Model", "Score - Neural Network Model", "IsHuman - RSCV Decision Tree", "IsOcclusion - Bayes"]
+		models = ["Score - Linear Regression", "Score - Ensemble Model", "Score - Stacked Classifier", "Score - Random Forest Regressor", "Score - Neural Network Model", "IsHuman - RSCV Decision Tree", "IsOcclusion - Bayes"]
 		self.model_var = tk.StringVar()
 		self.model_var.set(models[0])
 		model_dropdown = tk.OptionMenu(self.base_frame, self.model_var, *models)
@@ -170,8 +173,14 @@ class TestModelsPage(tk.Frame):
 			prediction = self.master.score_regression_model.predict([input_data])
 		elif self.model_var.get() == "Score - Ensemble Model":
 			prediction = self.master.score_ensemble_model.predict([input_data])
+		elif self.model_var.get() == "Score - Stacked Classifier":
+			prediction = self.master.score_stacked_classifier_model.predict([input_data])
+		elif self.model_var.get() == "Score - Random Forest Regressor":
+			prediction = self.master.score_random_forest_model.predict([input_data])
 		elif self.model_var.get() == "Score - Neural Network Model":
-			model = self.master.score_nn_model
+			model = NNScoreModel(len(input_data))
+			model.load_state_dict(self.master.score_nn_model)
+			model.eval()
 			input_tensor = torch.tensor(input_data).float()
 			prediction = model(input_tensor)
 		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
@@ -212,15 +221,9 @@ class TestModelsPage(tk.Frame):
 		self.result_number_label.config(text=f"Showing result: {i+1}/{len(self.pet_ids_and_scores)}")
 
 		# Display the prediction result based on the model
-		if self.model_var.get() == "Score - Linear Regression":
+		if self.model_var.get() != "IsHuman - RSCV Decision Tree" or self.model_var.get() != "IsOcclusion - Bayes":
 			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
 		
-		elif self.model_var.get() == "Score - Ensemble Model":
-			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
-		
-		elif self.model_var.get() == "Score - Neural Network Model":
-			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
-  
 		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
 			if self.pet_ids_and_scores.iloc[i][2] == 0:
 				self.result_label.config(text="Predicted Is Human: False")

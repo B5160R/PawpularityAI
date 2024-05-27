@@ -52,6 +52,8 @@ class Application(tk.Tk):
         # Score prediction models
         self.score_regression_model = joblib.load("../score_prediction_models/linear_regression_model/pawpularity_regression_model.pkl")
         self.score_ensemble_model = joblib.load("../score_prediction_models/ensemble_model/ensemble_model.pkl")
+        self.score_random_forest_model = joblib.load("../score_prediction_models/random_forrest_regressor_model/random_forest_regressor_model.pkl")
+        self.score_stacked_classifier_model = joblib.load("../score_prediction_models/stacked_classifier_model/stacked_classifier_model.pkl")
         self.score_nn_model = torch.load("../score_prediction_models/neural_network_model/neural_network_model.pth")
         
         # Feature finding models

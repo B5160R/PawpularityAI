@@ -1,0 +1,2 @@
+Mean Squared Error: 449.32485673732555
+Accuracy Score: -0.016489782730943148
