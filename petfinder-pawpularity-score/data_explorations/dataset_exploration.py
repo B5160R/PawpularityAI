@@ -37,8 +37,13 @@ sns.heatmap(corr_matrix, annot=True)
 plt.show()
 
 features = df.columns.values.tolist()
+plt.figure(figsize=(20, 20))
 for variable in features[1:-1]:
-    plt.figure(figsize=(10, 10))
+    plt.subplot(3, 3, features.index(variable))
     sns.boxplot(data=df, x=variable, y='Pawpularity')
-    plt.suptitle(variable, fontsize=20, fontweight='bold')
-    plt.show()
+    plt.title(variable, fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# save plot
+plt.savefig("exploration_outputs/box_plots.png")
