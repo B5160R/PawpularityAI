@@ -16,7 +16,8 @@ MODEL_PATHS = {
     "Score - Neural Network Model": "../score_prediction_models/neural_network_model/performance_metrics.txt",
     "Score - Random Forest Regressor": "../score_prediction_models/random_forrest_regressor_model/performance_metrics.txt",
     "Score - Stacked Classifier": "../score_prediction_models/stacked_classifier_model/performance_metrics.txt",
-    "IsHuman - Random Search CV Decision Tree": "../feature_finding_models/decision_tree_model/random_search_cv_performance_metrics.txt",
+    "IsHuman - Decision Tree Boost": "../feature_finding_models/decision_tree_model_boost/performance_metrics.txt",
+    "IsHuman - RSCV Decision Tree": "../feature_finding_models/rscv_decision_tree_model/performance_metrics.txt",
     "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/performance_metrics.txt",
     "Cat or Dog - CNN": "../image_models/cat_or_dog/performance_metrics.txt"
 }
@@ -71,7 +72,7 @@ class TestModelsPage(tk.Frame):
 			self.checkbox_vars.append(var)
 
 		# Create dropdown menu for selecting the model
-		models = ["Score - Linear Regression", "Score - Ensemble Model", "Score - Stacked Classifier", "Score - Random Forest Regressor", "Score - Neural Network Model", "IsHuman - RSCV Decision Tree", "IsOcclusion - Bayes"]
+		models = ["Score - Linear Regression", "Score - Ensemble Model", "Score - Stacked Classifier", "Score - Random Forest Regressor", "Score - Neural Network Model", "IsHuman - Decision Tree Boost", "IsHuman - RSCV Decision Tree", "IsOcclusion - Bayes"]
 		self.model_var = tk.StringVar()
 		self.model_var.set(models[0])
 		model_dropdown = tk.OptionMenu(self.base_frame, self.model_var, *models)
@@ -183,6 +184,8 @@ class TestModelsPage(tk.Frame):
 			model.eval()
 			input_tensor = torch.tensor(input_data).float()
 			prediction = model(input_tensor)
+		elif self.model_var.get() == "IsHuman - Decision Tree Boost":
+			prediction = self.master.is_human_decision_tree_boost_model.predict([input_data])
 		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
 			prediction = self.master.is_human_rscv_decision_tree_model.predict([input_data])
 		elif self.model_var.get() == "IsOcclusion - Bayes":
@@ -221,10 +224,10 @@ class TestModelsPage(tk.Frame):
 		self.result_number_label.config(text=f"Showing result: {i+1}/{len(self.pet_ids_and_scores)}")
 
 		# Display the prediction result based on the model
-		if self.model_var.get() != "IsHuman - RSCV Decision Tree" or self.model_var.get() != "IsOcclusion - Bayes":
+		if self.model_var.get() != "IsHuman - RSCV Decision Tree" or self.model_var.get() != "IsHuman - Decision Tree Boost" or self.model_var.get() != "IsOcclusion - Bayes":
 			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
 		
-		elif self.model_var.get() == "IsHuman - RSCV Decision Tree":
+		elif self.model_var.get() == "IsHuman - RSCV Decision Tree" or self.model_var.get() == "IsHuman - Decision Tree Boost":
 			if self.pet_ids_and_scores.iloc[i][2] == 0:
 				self.result_label.config(text="Predicted Is Human: False")
 			else:

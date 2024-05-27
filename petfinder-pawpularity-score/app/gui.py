@@ -58,7 +58,8 @@ class Application(tk.Tk):
         
         # Feature finding models
         self.is_occlusion_bayes_model = joblib.load("../feature_finding_models/bayes_model/occlusion_bayes_model.pkl")
-        self.is_human_rscv_decision_tree_model = joblib.load("../feature_finding_models/decision_tree_model/random_search_cv_is_human_decision_tree_model.pkl")
+        self.is_human_rscv_decision_tree_model = joblib.load("../feature_finding_models/rscv_decision_tree_model/random_search_cv_is_human_decision_tree_model.pkl")
+        self.is_human_decision_tree_boost_model = joblib.load("../feature_finding_models/decision_tree_model_boost/is_human_decision_tree_model_boost.pkl")
         
         # CNN models
         self.cat_or_dog_model = torch.load("../image_models/cat_or_dog/cat_or_dog_model.pth")
