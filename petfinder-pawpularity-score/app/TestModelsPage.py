@@ -134,16 +134,16 @@ class TestModelsPage(tk.Frame):
 		self.cnn_performance_label = tk.Label(self.base_frame, text="")
 		self.cnn_performance_label.grid(row=len(checkbox_labels) // 6 + 11, column=0, columnspan=6, padx=5, pady=5)
 
-	def run_featurespotter_on_image(self):
+	def load_and_preprocess_image(self, dimensions):
 		# Get the pet id
 		pet_id = self.pet_ids_and_scores.iloc[self.show_result_index][0]
 
 		# Define the transformation
 		transform = transforms.Compose([
-    transforms.Resize((135, 135)),  # Tilpas til størrelsen på billeder, som mange CNN-modeller forventer
-    transforms.ToTensor(),
+			transforms.Resize((dimensions, dimensions)),
+			transforms.ToTensor(),
 		])
-  
+
 		# Load the image
 		image_path = f"../data/pawpularity/train/{pet_id}.jpg"
 		image = Image.open(image_path).convert("RGB")
@@ -151,7 +151,12 @@ class TestModelsPage(tk.Frame):
 		# transform the image and add a batch dimension
 		image = transform(image)
 		image = image.unsqueeze(0)
-	
+
+		return image
+
+	def run_featurespotter_on_image(self):
+		# Load the image
+		image = self.load_and_preprocess_image(135)
 		# Run the image through the CNN
 		model = CNN(12) 
 		model.load_state_dict(self.master.featurespotter_model)
@@ -160,7 +165,6 @@ class TestModelsPage(tk.Frame):
 			output = model(image)
 			propabilities = torch.sigmoid(output) # Sigmoid since we are doing binary classification
 		propabilities = propabilities.squeeze().cpu().numpy() # Remove batch dimension and convert to numpy array
-
 
 		feature_probability_certainty = []
 		feature_names = ['Subject Focus', 'Eyes', 'Face', 'Near', 'Action', 'Accessory', 'Group', 'Collage', 'Human', 'Occlusion', 'Info', 'Blur']
@@ -181,20 +185,9 @@ class TestModelsPage(tk.Frame):
 		self.pet_score_label.config(text="")
 
 	def run_cnn_on_image(self):
-		# Get the pet id
-		pet_id = self.pet_ids_and_scores.iloc[self.show_result_index][0]
-	
 		# Load the image
-		image_path = f"../data/pawpularity/train/{pet_id}.jpg"
-		image = Image.open(image_path)
-	
-		# Resize the image
-		image = image.resize((64, 64))
-	
-		# Convert the image to a tensor
-		image = transforms.ToTensor()(image)
-		image = image.unsqueeze(0)
-	
+		image = self.load_and_preprocess_image(64)
+  
 		# Run the image through the CNN
 		model = CatOrDogCNN(2) 
 		model.load_state_dict(self.master.cat_or_dog_model)
@@ -221,10 +214,6 @@ class TestModelsPage(tk.Frame):
 		# Prepare the input data for the model
 		input_data = [int(value) for value in selected_values]
   
-		print("--------- Input Data ---------")
-		print(input_data)
-		print("------------------------------")
-  
 		# Run the model prediction
 		if self.model_var.get() == "Score - Linear Regression":
 			prediction = self.master.score_regression_model.predict([input_data])
@@ -246,10 +235,6 @@ class TestModelsPage(tk.Frame):
 			prediction = self.master.is_human_rscv_decision_tree_model.predict([input_data])
 		elif self.model_var.get() == "IsOcclusion - Bayes":
 			prediction = self.master.is_occlusion_bayes_model.predict([input_data])
-
-		print("--------- Prediction ---------")
-		print(prediction)
-		print("------------------------------")
   
 		pet_ids_and_scores = self.get_pet_ids_and_scores(input_data)
 		
@@ -280,9 +265,9 @@ class TestModelsPage(tk.Frame):
 		self.result_number_label.config(text=f"Showing result: {i+1}/{len(self.pet_ids_and_scores)}")
 
 		# Display the prediction result based on the model
-		if self.model_var.get() != "IsHuman - RSCV Decision Tree" or self.model_var.get() != "IsHuman - Decision Tree Boost" or self.model_var.get() != "IsOcclusion - Bayes":
+		if self.model_var.get() != "IsHuman - RSCV Decision Tree" and self.model_var.get() != "IsHuman - Decision Tree Boost" and self.model_var.get() != "IsOcclusion - Bayes":
 			self.result_label.config(text=f"Predicted Pawpularity Score: {self.pet_ids_and_scores.iloc[i][2]} ")
-		
+			
 		elif self.model_var.get() == "IsHuman - RSCV Decision Tree" or self.model_var.get() == "IsHuman - Decision Tree Boost":
 			if self.pet_ids_and_scores.iloc[i][2] == 0:
 				self.result_label.config(text="Predicted Is Human: False")
