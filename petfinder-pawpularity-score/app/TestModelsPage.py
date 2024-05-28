@@ -161,6 +161,7 @@ class TestModelsPage(tk.Frame):
 			propabilities = torch.sigmoid(output) # Sigmoid since we are doing binary classification
 		propabilities = propabilities.squeeze().cpu().numpy() # Remove batch dimension and convert to numpy array
 
+
 		feature_probability_certainty = []
 		feature_names = ['Subject Focus', 'Eyes', 'Face', 'Near', 'Action', 'Accessory', 'Group', 'Collage', 'Human', 'Occlusion', 'Info', 'Blur']
 		for i, feature_name in enumerate(feature_names):
@@ -168,13 +169,16 @@ class TestModelsPage(tk.Frame):
 				feature_probability_certainty.append(f"Certainty percentage for {feature_name}: {propabilities[i]:.2f} /\n")
 			feature_probability_certainty.append(f"Certainty percentage for {feature_name}: {propabilities[i]:.2f}")
 		
-		# Display the result
-		feature_probability_certainty_string = "/".join(feature_probability_certainty)
-		self.cnn_result_label.config(text=feature_probability_certainty_string)
+		features_spotted = [feature_names[i] for i in range(len(propabilities)) if propabilities[i] > 0.5]
+		
+  # Display the result
+		features_spotted_string = " / ".join(features_spotted)
+		self.cnn_result_label.config(text=features_spotted_string)
 
   	# Display performance metrics
-		metrics = self.read_metrics("../image_models/featurespotter/performance_metrics.txt")
-		self.cnn_performance_label.config(metrics)
+		feature_probability_certainty_string = "/".join(feature_probability_certainty)
+		self.result_label.config(text=feature_probability_certainty_string)
+		self.pet_score_label.config(text="")
 
 	def run_cnn_on_image(self):
 		# Get the pet id

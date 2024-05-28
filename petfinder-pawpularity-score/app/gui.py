@@ -7,7 +7,7 @@ from TestModelsPage import TestModelsPage
 from ExplorationPage import ExplorationPage
 
 TITLE = "Petfinder Pawpularity Score"
-GEOMETRY = "800x750"
+GEOMETRY = "800x850"
 FONT = ("Helvetica", 16, "bold")
 TITLE_ROW = 0
 TITLE_COLUMN = 0
