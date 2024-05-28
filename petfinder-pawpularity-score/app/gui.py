@@ -7,7 +7,7 @@ from TestModelsPage import TestModelsPage
 from ExplorationPage import ExplorationPage
 
 TITLE = "Petfinder Pawpularity Score"
-GEOMETRY = "800x750"
+GEOMETRY = "800x850"
 FONT = ("Helvetica", 16, "bold")
 TITLE_ROW = 0
 TITLE_COLUMN = 0
@@ -63,6 +63,7 @@ class Application(tk.Tk):
         
         # CNN models
         self.cat_or_dog_model = torch.load("../image_models/cat_or_dog/cat_or_dog_model.pth")
+        self.featurespotter_model = torch.load("../image_models/featurespotter/trained_model3.pth")
 
 if __name__ == "__main__":
     app = Application()
