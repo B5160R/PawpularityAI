@@ -53,65 +53,45 @@ class ExplorationPage(tk.Frame):
 		result_label = tk.Label(self.base_frame, image=None)
 		result_label.grid(row=3, column=0, columnspan=3)
 	
-	def show_kmeans_clustering(self):
-		self.result_label = tk.Label(self.base_frame, image=None)
-		image = Image.open(EXPLORATION_DATA_PATHS["kmeans_clustering_plot"])
-		image = image.resize((600, 600))
+	def show_image(self, image):
+		image = image.resize((800, 600))
 		self.photo = ImageTk.PhotoImage(image)
 		self.result_label = tk.Label(self.base_frame, image=self.photo)
 		self.result_label.image = self.photo
 		self.result_label.grid(row=3, column=0, columnspan=3)
+  
+	def show_kmeans_clustering(self):
+		self.result_label = tk.Label(self.base_frame, image=None)
+		image = Image.open(EXPLORATION_DATA_PATHS["kmeans_clustering_plot"])
+		self.show_image(image)
 
 	def show_pca_visualization(self):
 		self.result_label = tk.Label(self.base_frame, image=None)
 		image = Image.open(EXPLORATION_DATA_PATHS["pca_visualization_plot"])
-		image = image.resize((600, 600))
-		self.photo = ImageTk.PhotoImage(image)
-		self.result_label = tk.Label(self.base_frame, image=self.photo)
-		self.result_label.image = self.photo
-		self.result_label.grid(row=3, column=0, columnspan=3)
+		self.show_image(image)
   
 	def show_db_scan_clustering(self):
 		self.result_label = tk.Label(self.base_frame, image=None)
 		image = Image.open(EXPLORATION_DATA_PATHS["db_scan_clustering_plot"])
-		image = image.resize((600, 600))
-		self.photo = ImageTk.PhotoImage(image)
-		self.result_label = tk.Label(self.base_frame, image=self.photo)
-		self.result_label.image = self.photo
-		self.result_label.grid(row=3, column=0, columnspan=3)
+		self.show_image(image)
     
 	def show_pawpularity_distribution(self):
 		self.result_label = tk.Label(self.base_frame, image=None)
 		image = Image.open(EXPLORATION_DATA_PATHS["pawpularity_distribution_plot"])
-		image = image.resize((800, 600))
-		self.photo = ImageTk.PhotoImage(image)
-		self.result_label = tk.Label(self.base_frame, image=self.photo)
-		self.result_label.image = self.photo
-		self.result_label.grid(row=3, column=0, columnspan=3)
+		self.show_image(image)
 
 	def show_correlation_matrix(self):
 		self.result_label = tk.Label(self.base_frame, image=None)
 		image = Image.open(EXPLORATION_DATA_PATHS["correlation_matrix_plot"])
-		image = image.resize((800, 600))
-		self.photo = ImageTk.PhotoImage(image)
-		self.result_label = tk.Label(self.base_frame, image=self.photo)
-		self.result_label.image = self.photo
-		self.result_label.grid(row=3, column=0, columnspan=3)
+		self.show_image(image)
 
 	def show_elbow_method(self):
 		self.result_label = tk.Label(self.base_frame, image=None)
 		image = Image.open(EXPLORATION_DATA_PATHS["elbow_method_plot"])
-		image = image.resize((600, 600))
-		self.photo = ImageTk.PhotoImage(image)
-		self.result_label = tk.Label(self.base_frame, image=self.photo)
-		self.result_label.image = self.photo
-		self.result_label.grid(row=3, column=0, columnspan=3)
+		self.show_image(image)
   
 	def show_box_plots(self):
 		self.result_label = tk.Label(self.base_frame, image=None)
 		image = Image.open(EXPLORATION_DATA_PATHS["box_plots"])
-		image = image.resize((800, 600))
-		self.photo = ImageTk.PhotoImage(image)
-		self.result_label = tk.Label(self.base_frame, image=self.photo)
-		self.result_label.image = self.photo
-		self.result_label.grid(row=3, column=0, columnspan=3)
+		self.show_image(image)
+
