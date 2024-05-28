@@ -9,17 +9,20 @@ sys.path.append("../score_prediction_models/neural_network_model")
 from NNScoreModel import NNScoreModel
 sys.path.append("../image_models/cat_or_dog")
 from CatOrDogCNN import CatOrDogCNN
+sys.path.append("../image_models/featurespotter")
+from FeatureSpotterCNN import CNN
 
 MODEL_PATHS = {
-    "Score - Linear Regression": "../score_prediction_models/linear_regression_model/",
-    "Score - Ensemble Model": "../score_prediction_models/ensemble_model/",
-    "Score - Neural Network Model": "../score_prediction_models/neural_network_model/",
-    "Score - Random Forest Regressor": "../score_prediction_models/random_forrest_regressor_model/",
-    "Score - Stacked Classifier": "../score_prediction_models/stacked_classifier_model/",
-    "IsHuman - Decision Tree Boost": "../feature_finding_models/decision_tree_model_boost/",
-    "IsHuman - RSCV Decision Tree": "../feature_finding_models/rscv_decision_tree_model/",
-    "IsOcclusion - Bayes": "../feature_finding_models/bayes_model/",
-    "Cat or Dog - CNN": "../image_models/cat_or_dog/"
+	"Score - Linear Regression": "../score_prediction_models/linear_regression_model/",
+	"Score - Ensemble Model": "../score_prediction_models/ensemble_model/",
+	"Score - Neural Network Model": "../score_prediction_models/neural_network_model/",
+	"Score - Random Forest Regressor": "../score_prediction_models/random_forrest_regressor_model/",
+	"Score - Stacked Classifier": "../score_prediction_models/stacked_classifier_model/",
+	"IsHuman - Decision Tree Boost": "../feature_finding_models/decision_tree_model_boost/",
+	"IsHuman - RSCV Decision Tree": "../feature_finding_models/rscv_decision_tree_model/",
+	"IsOcclusion - Bayes": "../feature_finding_models/bayes_model/",
+	"Cat or Dog - CNN": "../image_models/cat_or_dog/",
+	"Feature Spotter": "../image_models/featurespotter/"
 }
 
 class TestModelsPage(tk.Frame):
@@ -121,11 +124,57 @@ class TestModelsPage(tk.Frame):
 		self.run_cnn_on_image_button = tk.Button(self.base_frame, text="Run CNN on Image", command=self.run_cnn_on_image)
 		self.run_cnn_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=0, columnspan=6, padx=5, pady=5)
 		self.run_cnn_on_image_button.grid_remove()  # Hide the run cnn on image button initially
-
+  	
+		self.run_featurespotter_on_image_button = tk.Button(self.base_frame, text="Run Featurespotter on Image", command=self.run_featurespotter_on_image)
+		self.run_featurespotter_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=3, columnspan=6, padx=5, pady=5)
+		self.run_featurespotter_on_image_button.grid_remove() # Hide the run featurespotter on image button initially
+  
 		self.cnn_result_label = tk.Label(self.base_frame, text="")
 		self.cnn_result_label.grid(row=len(checkbox_labels) // 6 + 10, column=0, columnspan=6, padx=5, pady=5)
 		self.cnn_performance_label = tk.Label(self.base_frame, text="")
 		self.cnn_performance_label.grid(row=len(checkbox_labels) // 6 + 11, column=0, columnspan=6, padx=5, pady=5)
+
+	def run_featurespotter_on_image(self):
+		# Get the pet id
+		pet_id = self.pet_ids_and_scores.iloc[self.show_result_index][0]
+
+		# Define the transformation
+		transform = transforms.Compose([
+    transforms.Resize((135, 135)),  # Tilpas til størrelsen på billeder, som mange CNN-modeller forventer
+    transforms.ToTensor(),
+		])
+  
+		# Load the image
+		image_path = f"../data/pawpularity/train/{pet_id}.jpg"
+		image = Image.open(image_path).convert("RGB")
+
+		# transform the image and add a batch dimension
+		image = transform(image)
+		image = image.unsqueeze(0)
+	
+		# Run the image through the CNN
+		model = CNN(12) 
+		model.load_state_dict(self.master.featurespotter_model)
+		model.eval()
+		with torch.no_grad():
+			output = model(image)
+			propabilities = torch.sigmoid(output) # Sigmoid since we are doing binary classification
+		propabilities = propabilities.squeeze().cpu().numpy() # Remove batch dimension and convert to numpy array
+
+		feature_probability_certainty = []
+		feature_names = ['Subject Focus', 'Eyes', 'Face', 'Near', 'Action', 'Accessory', 'Group', 'Collage', 'Human', 'Occlusion', 'Info', 'Blur']
+		for i, feature_name in enumerate(feature_names):
+			if i == 2 or i == 4 or i == 6 or i == 8 or i == 10:
+				feature_probability_certainty.append(f"Certainty percentage for {feature_name}: {propabilities[i]:.2f} /\n")
+			feature_probability_certainty.append(f"Certainty percentage for {feature_name}: {propabilities[i]:.2f}")
+		
+		# Display the result
+		feature_probability_certainty_string = "/".join(feature_probability_certainty)
+		self.cnn_result_label.config(text=feature_probability_certainty_string)
+
+  	# Display performance metrics
+		metrics = self.read_metrics("../image_models/featurespotter/performance_metrics.txt")
+		self.cnn_performance_label.config(metrics)
 
 	def run_cnn_on_image(self):
 		# Get the pet id
@@ -151,7 +200,6 @@ class TestModelsPage(tk.Frame):
 		predicted_class = propabilities.argmax().item()
 		certainty_percentage = propabilities[0][predicted_class].item() * 100
   
-
 		# Display the result
 		if predicted_class == 0:
 			self.cnn_result_label.config(text=f"The model predicts that the image is a cat.\nPrediction Certainty: {certainty_percentage:.2f}%")
@@ -265,8 +313,9 @@ class TestModelsPage(tk.Frame):
 		self.next_button.grid()
 		self.previous_button.grid()
   
-		# Display the run cnn on image button
+		# Display the run cnn and featurespotter on image button
 		self.run_cnn_on_image_button.grid()
+		self.run_featurespotter_on_image_button.grid()
   
 	def get_pet_ids_and_scores(self, input_data):
 		# Load the train.csv file
@@ -318,4 +367,5 @@ class TestModelsPage(tk.Frame):
 		self.next_button.grid_remove()
 		self.previous_button.grid_remove()
 		self.run_cnn_on_image_button.grid_remove()
+		self.run_featurespotter_on_image_button.grid_remove()
 		self.cnn_result_label.config(text="")
