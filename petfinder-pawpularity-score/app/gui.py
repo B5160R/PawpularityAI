@@ -65,6 +65,7 @@ class Application(tk.Tk):
         self.cat_or_dog_model = torch.load("../image_models/cat_or_dog/cat_or_dog_model.pth")
         self.featurespotter_model_2 = torch.load("../image_models/featurespotter/trained_model2.pth")
         self.featurespotter_model_3 = torch.load("../image_models/featurespotter/trained_model3.pth")
+        self.featurespotter_model_4 = torch.load("../image_models/featurespotter/trained_model4.pth")
 
 if __name__ == "__main__":
     app = Application()
