@@ -124,10 +124,18 @@ class TestModelsPage(tk.Frame):
 		self.run_cnn_on_image_button = tk.Button(self.base_frame, text="Run CNN on Image", command=self.run_cnn_on_image)
 		self.run_cnn_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=0, columnspan=6, padx=5, pady=5)
 		self.run_cnn_on_image_button.grid_remove()  # Hide the run cnn on image button initially
-  	
+		
 		self.run_featurespotter_on_image_button = tk.Button(self.base_frame, text="Run Featurespotter on Image", command=self.run_featurespotter_on_image)
 		self.run_featurespotter_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=3, columnspan=6, padx=5, pady=5)
 		self.run_featurespotter_on_image_button.grid_remove() # Hide the run featurespotter on image button initially
+  	
+		# Create dropdown menu for selecting the featurespotter model
+		fs_models = ["model_2", "model_3"]
+		self.fs_model_var = tk.StringVar()
+		self.fs_model_var.set(fs_models[0])
+		model_dropdown = tk.OptionMenu(self.base_frame, self.fs_model_var, *fs_models)
+		model_dropdown.grid(row=len(checkbox_labels) // 6 + 9, column=6, padx=5, pady=5, columnspan=6)
+		
   
 		self.cnn_result_label = tk.Label(self.base_frame, text="")
 		self.cnn_result_label.grid(row=len(checkbox_labels) // 6 + 10, column=0, columnspan=6, padx=5, pady=5)
@@ -159,7 +167,10 @@ class TestModelsPage(tk.Frame):
 		image = self.load_and_preprocess_image(135)
 		# Run the image through the CNN
 		model = CNN(12) 
-		model.load_state_dict(self.master.featurespotter_model)
+		if self.fs_model_var.get() == "model_2":
+			model.load_state_dict(self.master.featurespotter_model_2)
+		elif self.fs_model_var.get() == "model_3":
+			model.load_state_dict(self.master.featurespotter_model_3)
 		model.eval()
 		with torch.no_grad():
 			output = model(image)
