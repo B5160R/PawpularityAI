@@ -122,12 +122,20 @@ class TestModelsPage(tk.Frame):
 		self.next_button.grid_remove()  # Hide the next button initially
   
 		self.run_cnn_on_image_button = tk.Button(self.base_frame, text="Run CNN on Image", command=self.run_cnn_on_image)
-		self.run_cnn_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=0, columnspan=6, padx=5, pady=5)
+		self.run_cnn_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=0, columnspan=4, padx=5, pady=5)
 		self.run_cnn_on_image_button.grid_remove()  # Hide the run cnn on image button initially
-  	
+		
 		self.run_featurespotter_on_image_button = tk.Button(self.base_frame, text="Run Featurespotter on Image", command=self.run_featurespotter_on_image)
-		self.run_featurespotter_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=3, columnspan=6, padx=5, pady=5)
+		self.run_featurespotter_on_image_button.grid(row=len(checkbox_labels) // 6 + 9, column=3, columnspan=4, padx=5, pady=5)
 		self.run_featurespotter_on_image_button.grid_remove() # Hide the run featurespotter on image button initially
+  	
+		# Create dropdown menu for selecting the featurespotter model
+		fs_models = ["fsmodel_10_epochs", "fsmodel_20_epochs", "fsmodel_100_epochs"]
+		self.fs_model_var = tk.StringVar()
+		self.fs_model_var.set(fs_models[0])
+		model_dropdown = tk.OptionMenu(self.base_frame, self.fs_model_var, *fs_models)
+		model_dropdown.grid(row=len(checkbox_labels) // 6 + 9, column=6, padx=5, pady=5, columnspan=4)
+		
   
 		self.cnn_result_label = tk.Label(self.base_frame, text="")
 		self.cnn_result_label.grid(row=len(checkbox_labels) // 6 + 10, column=0, columnspan=6, padx=5, pady=5)
@@ -159,7 +167,12 @@ class TestModelsPage(tk.Frame):
 		image = self.load_and_preprocess_image(135)
 		# Run the image through the CNN
 		model = CNN(12) 
-		model.load_state_dict(self.master.featurespotter_model)
+		if self.fs_model_var.get() == "fsmodel_10_epochs":
+			model.load_state_dict(self.master.featurespotter_model_2)
+		elif self.fs_model_var.get() == "fsmodel_20_epochs":
+			model.load_state_dict(self.master.featurespotter_model_3)
+		elif self.fs_model_var.get() == "fsmodel_100_epochs":
+			model.load_state_dict(self.master.featurespotter_model_4)
 		model.eval()
 		with torch.no_grad():
 			output = model(image)
@@ -171,7 +184,8 @@ class TestModelsPage(tk.Frame):
 		for i, feature_name in enumerate(feature_names):
 			if i == 2 or i == 4 or i == 6 or i == 8 or i == 10:
 				feature_probability_certainty.append(f"Certainty percentage for {feature_name}: {propabilities[i]:.2f} /\n")
-			feature_probability_certainty.append(f"Certainty percentage for {feature_name}: {propabilities[i]:.2f}")
+			else:
+				feature_probability_certainty.append(f"Certainty percentage for {feature_name}: {propabilities[i]:.2f}")
 		
 		features_spotted = [feature_names[i] for i in range(len(propabilities)) if propabilities[i] > 0.5]
 		
