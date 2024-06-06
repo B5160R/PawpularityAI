@@ -4,10 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, accuracy_score
+from sklearn.metrics import mean_absolute_error, accuracy_score
 
 # Load the data
-df = pd.read_csv("../../data/pawpularity/train.csv")
+#df = pd.read_csv("../../data/pawpularity/train.csv")
+df = pd.read_csv("C:/Users/freid/Documents/SWVF24/AI/PawpularityAI/petfinder-pawpularity-score/data/pawpularity/train.csv")
 
 # Split the data into features and target variable
 X = df.drop(['Id', 'Pawpularity'], axis=1)
@@ -29,15 +30,15 @@ predictions = model.predict(X_test)
 print("Predictions: ", predictions)
 print("Actual: ", y_test.values)
 
-mse = mean_squared_error(y_test, predictions)
+mae = mean_absolute_error(y_test, predictions)
 r2_score = model.score(X_test, y_test)
 
-print ("Mean Squared Error: ", mse)
+print ("Mean Absolute Error: ", mae)
 print (f"R^2 Score: ", r2_score)
 
 # Save the performance metrics
 with open("performance_metrics.txt", "w") as f:
-		f.write(f"Mean Squared Error: {mse}\n")
+		f.write(f"Mean Squared Error: {mae}\n")
 		f.write(f"R^2 Score: {r2_score}\n")
   
 
