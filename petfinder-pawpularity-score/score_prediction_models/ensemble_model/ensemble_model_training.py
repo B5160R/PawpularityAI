@@ -22,7 +22,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 decision_tree = DecisionTreeClassifier()
 logistic = LogisticRegression()
 
-# Define meta-learner (replace with your preferred model)
+# Define meta-learner
 meta_learner = LogisticRegression()
 
 # Bagging ensemble

@@ -57,10 +57,14 @@ y_pred = y_pred.detach().numpy().argmax(axis=1)
 cm = confusion_matrix(y_test, y_pred)
 print(cm)
 
+print("Actual: ", y_test.values[:5])
+print("Predicted: ", y_pred[:5])
+
 precision = precision_score(y_test, y_pred, average='weighted')
 recall = recall_score(y_test, y_pred, average='weighted')
 f1 = f1_score(y_test, y_pred, average='weighted')
 
+print(f"Confusion Matrix: {cm}")
 print(f"Precision: {precision}")
 print(f"Recall: {recall}")
 print(f"F1 Score: {f1}")

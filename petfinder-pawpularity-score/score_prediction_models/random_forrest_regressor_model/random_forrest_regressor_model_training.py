@@ -25,16 +25,20 @@ joblib.dump(model, "random_forest_regressor_model.pkl")
 
 # Make predictions and evaluate the model
 predictions = model.predict(X_test)
+
+print("Predictions: ", predictions)
+print("Actual: ", y_test.values)
+
 mse = mean_squared_error(y_test, predictions)
-accuracy_score = model.score(X_test, y_test)
+r2_score = model.score(X_test, y_test)
 
 print ("Mean Squared Error: ", mse)
-print ("Accuracy Score: ", accuracy_score)
+print (f"R^2 Score: ", r2_score)
 
 # Save the performance metrics
 with open("performance_metrics.txt", "w") as f:
 		f.write(f"Mean Squared Error: {mse}\n")
-		f.write(f"Accuracy Score: {accuracy_score}\n")
+		f.write(f"R^2 Score: {r2_score}\n")
   
 
 importances = model.feature_importances_
