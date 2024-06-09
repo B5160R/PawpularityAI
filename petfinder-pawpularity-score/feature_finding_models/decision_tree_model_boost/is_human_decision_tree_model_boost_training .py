@@ -20,12 +20,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # train model with decision tree
-base_estimator = DecisionTreeClassifier(
+base = DecisionTreeClassifier(
 	criterion="gini",
 	max_depth=10
 )
 
-model_ada = AdaBoostClassifier(base_estimator=base_estimator, n_estimators=50, random_state=42)
+model_ada = AdaBoostClassifier(base_estimator=base, n_estimators=50, random_state=42)
 model_ada.fit(X_train, y_train)
 
 # save model
